@@ -1,4 +1,5 @@
 # UPI Offline Mesh — Demo
+<img width="1322" height="1012" alt="image" src="https://github.com/user-attachments/assets/1d519086-77b4-48ba-98df-6f4999fa938a" />
 
 A Spring Boot backend that demonstrates **offline UPI payments routed through a Bluetooth-style mesh network**. You're in a basement with zero connectivity. You send your friend ₹500. Your phone encrypts the payment, broadcasts it to nearby phones, and the packet hops device-to-device until *some* phone walks outside, gets 4G, and silently uploads it to this backend. The backend decrypts, deduplicates, and settles.
 
@@ -39,6 +40,14 @@ You'll see all three in the dashboard.
 
 - **JDK 17 or newer** installed and on PATH (or `JAVA_HOME` set). Check with `java -version`.
 - That's it. No database, no Redis, no Maven (the wrapper handles it). Just Java.
+
+### Run on Docker
+Open a terminal. You must have installed [docker](https://docker.com) in your system to run in docker for this application. 
+```
+docker build -t upi-java-app .
+docker run -d -p 8080:8080 --name upi-container upi-java-app
+```
+You can access the web app through: [http://localhost:8080/](http://localhost:8080/)
 
 ### Run on Windows
 
