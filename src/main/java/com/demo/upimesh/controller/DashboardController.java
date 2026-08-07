@@ -10,4 +10,9 @@ public class DashboardController {
     public String home() {
         return "dashboard";
     }
+
+    @GetMapping("/qr-demo")
+    public String qrDemo() {
+        return "qr-demo";
+    }
 }

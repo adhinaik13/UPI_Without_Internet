@@ -30,6 +30,7 @@ public class ApiController {
     @Autowired private AccountRepository accountRepo;
     @Autowired private TransactionRepository txRepo;
     @Autowired private IdempotencyService idempotency;
+    @Autowired private QrCodeService qrCodeService;
 
     // ------------------------------------------------------------------ key
 
@@ -172,5 +173,32 @@ public class ApiController {
     @GetMapping("/transactions")
     public List<Transaction> listTransactions() {
         return txRepo.findTop20ByOrderByIdDesc();
+    }
+
+    // -------------------------------------------------------------- qr code
+
+    /**
+     * Generate a QR code containing an encrypted payment packet.
+     * This simulates what a sender's phone would display in offline mode.
+     */
+    @GetMapping(value = "/demo/qr", produces = "application/json")
+    public ResponseEntity<?> generateQrCode(
+            @RequestParam String senderVpa,
+            @RequestParam String receiverVpa,
+            @RequestParam String amount,
+            @RequestParam String pin) throws Exception {
+
+        MeshPacket packet = demo.createPacket(
+                senderVpa, receiverVpa, new java.math.BigDecimal(amount), pin, 5);
+
+        String qrData = packet.getPacketId() + "|" + packet.getCiphertext();
+        String base64Qr = qrCodeService.generateQrCodeBase64(qrData, 300, 300);
+
+        return ResponseEntity.ok(Map.of(
+                "packetId", packet.getPacketId(),
+                "qrCodeBase64", "data:image/png;base64," + base64Qr,
+                "ttl", packet.getTtl(),
+                "ciphertextLength", packet.getCiphertext().length()
+        ));
     }
 }
