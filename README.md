@@ -19,12 +19,15 @@ Generate an encrypted offline payment QR code in seconds. Scan it with any phone
 
 ---
 
-
 ## 📸 Screenshots
 
-| Dashboard | QR Code Generator | API Docs |
-|-----------|-------------------|----------|
-| ![Dashboard](screenshots/dashboard.png) | ![QR](screenshots/qr-demo.png) | ![Swagger](screenshots/swagger.png) |
+<p align="center">
+  <img src="screenshots/dashboard.png" width="30%" alt="Dashboard">
+  &nbsp;
+  <img src="screenshots/qr-demo.png" width="30%" alt="QR Code Generator">
+  &nbsp;
+  <img src="screenshots/swagger.png" width="30%" alt="API Docs">
+</p>
 
 ## ✨ What Makes This Special
 
