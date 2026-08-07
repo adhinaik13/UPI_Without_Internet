@@ -1,3 +1,5 @@
+[![Java CI](https://github.com/adhinaik13/UPI_Without_Internet/actions/workflows/ci.yml/badge.svg)](https://github.com/adhinaik13/UPI_Without_Internet/actions)
+
 # 🔐 UPI Offline Mesh — Cryptographic Offline Payments
 
 [![Java 17](https://img.shields.io/badge/Java-17-blue)](https://adoptium.net/)
@@ -16,6 +18,13 @@
 Generate an encrypted offline payment QR code in seconds. Scan it with any phone camera.
 
 ---
+
+
+## 📸 Screenshots
+
+| Dashboard | QR Code Generator | API Docs |
+|-----------|-------------------|----------|
+| ![Dashboard](screenshots/dashboard.png) | ![QR](screenshots/qr-demo.png) | ![Swagger](screenshots/swagger.png) |
 
 ## ✨ What Makes This Special
 
