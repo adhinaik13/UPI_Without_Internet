@@ -18,7 +18,6 @@
 Generate an encrypted offline payment QR code in seconds. Scan it with any phone camera.
 
 ---
-
 ## 📸 Screenshots
 
 <p align="center">
