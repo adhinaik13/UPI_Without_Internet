@@ -19,6 +19,9 @@ Generate an encrypted offline payment QR code in seconds. Scan it with any phone
 
 ---
 
+### 🎥 Demo Video
+[Watch on YouTube](https://youtu.be/_jcLwtK2IOU) — Full offline payment flow: QR generation → mesh propagation → settlement
+
 ## ✨ What Makes This Special
 
 | Feature | What It Does | Impact |
