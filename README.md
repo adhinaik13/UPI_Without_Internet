@@ -117,14 +117,12 @@ Linux / macOS
 Windows
 mvnw.cmd spring-boot:run
 
-Open in Browser
+**Open in Browser**
 
-| Service        | URL                                     |
-| -------------- | --------------------------------------- |
-| 🏠 Dashboard   | `http://localhost:8080`                 |
-| 📱 QR Demo     | `http://localhost:8080/qr-demo`         |
-| 📚 Swagger UI  | `http://localhost:8080/swagger-ui.html` |
-| 🗄️ H2 Console | `http://localhost:8080/h2-console`      |
+| 🏠 Dashboard   | [http://localhost:8080](http://localhost:8080)                           |
+| 📱 QR Demo     | [http://localhost:8080/qr-demo](http://localhost:8080/qr-demo)           |
+| 📚 Swagger UI  | [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) |
+| 🗄️ H2 Console | [http://localhost:8080/h2-console](http://localhost:8080/h2-console)     |
 
 Run with Docker
 
