@@ -6,8 +6,22 @@
 [![Spring Boot 3.3](https://img.shields.io/badge/Spring%20Boot-3.3-green)](https://spring.io/projects/spring-boot)
 [![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 
-&gt; **Offline peer-to-peer payments with cryptographic settlement.**  
+&gt; **Offline peer-to-peer payments with cryptographic settlement.**
 &gt; Two phones in a basement with zero connectivity can exchange value via QR codes. When any device gains internet, the payment settles atomically with bank-grade security.
+
+&gt; ⚠️ **Current Status:** This repository implements the **backend settlement gateway** and **QR-code payment simulation**. The mesh networking layer (Bluetooth LE, WiFi Direct) is architected and simulated server-side; native Android transport is the next integration phase.
+
+---
+
+## 🏗️ Architecture
+
+Sender Phone (Offline)          Mesh Network              Spring Boot Gateway
+├─ Compose payment               ├─ Store & forward        ├─ SHA-256 hash
+├─ AES-256-GCM encrypt           ├─ Gossip protocol          ├─ Atomic claim (Redis/Map)
+├─ RSA-OAEP wrap key             ├─ Bridge nodes             ├─ Decrypt + verify
+└─ Display QR code               └─ Upload when online       ├─ Debit/Credit (atomic TX)
+└─ Write ledger
+
 
 ---
 
@@ -17,10 +31,10 @@
 
 Generate an encrypted offline payment QR code in seconds. Scan it with any phone camera.
 
----
-
 ### 🎥 Demo Video
 [Watch on YouTube](https://youtu.be/_jcLwtK2IOU) — Full offline payment flow: QR generation → mesh propagation → settlement
+
+---
 
 ## ✨ What Makes This Special
 
@@ -36,4 +50,27 @@ Generate an encrypted offline payment QR code in seconds. Scan it with any phone
 
 ---
 
-## 🏗️ Architecture
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| **Backend** | Spring Boot 3.3, Java 17 |
+| **Security** | RSA-2048 OAEP, AES-256-GCM, SHA-256, libsodium |
+| **Database** | H2 (dev) / PostgreSQL (prod) |
+| **Cache** | ConcurrentHashMap (dev) / Redis (prod) |
+| **QR Codes** | ZXing (Google) |
+| **Build** | Maven, Docker Compose |
+| **Docs** | OpenAPI 3.0 / Swagger UI |
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+- JDK 17+
+- Maven (wrapper included)
+
+### Run Locally
+```bash
+./mvnw spring-boot:run
+# Windows: mvnw.cmd spring-boot:run
