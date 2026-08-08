@@ -80,7 +80,8 @@ The demo allows you to generate an encrypted payment QR code and follow the tran
 | 📚 **API Documentation**          | OpenAPI / Swagger                              | Explore and test APIs                      |
 | 🐳 **Docker Support**             | Docker / Docker Compose                        | Simplify local deployment                  |
 | 🔄 **Database Migration Support** | Flyway                                         | Manage database schema changes             |
-| 🤖 **CI**                         | GitHub Actions                                 | Automatically build and test changes       |
+| 🔏 **Digital Signatures**         | RSA-PSS per-device keypairs                    | Sender authentication & non-repudiation    |
+| 🤖 **CI**                         | GitHub Actions                                 | Automatically build and test changes       |   
 
 🛠️ Tech Stack
 
@@ -214,14 +215,54 @@ Future Android integration can use hardware-backed key storage such as:
 
 • Android StrongBox
 • Trusted Execution Environment (TEE)
+
 This is planned future work, not part of the current backend implementation.
 
-🔄 **Payment Flow**
+### **6. Digital Signatures (Sender Authentication)**
+
+Each device generates its own 2048-bit RSA keypair. The private key never leaves the device. The public key is registered with the settlement gateway and linked to the device's VPA.
+
+```text
+Payment Instruction (canonical)
+       │
+       ▼
+   RSA-PSS Sign
+   (device private key)
+       │
+       ▼
+   Signature
+       │
+       +────► Encrypted into packet
+       │
+       ▼
+Settlement Gateway
+       │
+       ▼
+   Decrypt packet
+       │
+       ▼
+   Look up sender's public key by fingerprint
+       │
+       ▼
+   Verify RSA-PSS signature
+       │
+   ┌───┴───┐
+   ▼       ▼
+  VALID   INVALID
+   │         │
+   ▼         ▼
+ Settle    Reject
+
+## **🔄 Payment Flow**
 
              CREATE PAYMENT
                     │
                     ▼
           Build Transaction
+                    │
+                    ▼
+          Sign with Device Key
+             RSA-PSS
                     │
                     ▼
           Encrypt Payload
@@ -248,23 +289,35 @@ This is planned future work, not part of the current backend implementation.
           Settlement Gateway
                     │
                     ▼
-          Decrypt + Validate
+               Decrypt
                     │
                     ▼
-          Idempotency Check
+          Verify Signature
+         (sender's public key)
                     │
-          ┌─────────┴─────────┐
-          │                   │
-      Duplicate            New TX
-          │                   │
-          ▼                   ▼
-       Reject             Atomic Claim
-                              │
-                              ▼
-                         Debit / Credit
-                              │
-                              ▼
-                           SETTLED
+              ┌────┴────┐
+              ▼         ▼
+           VALID     INVALID
+              │         │
+              ▼         ▼
+         Check Fresh   Reject
+         (nonce/expiry)
+              │
+              ▼
+         Idempotency
+              │
+       ┌──────┴──────┐
+       ▼             ▼
+   Duplicate      New TX
+       │             │
+       ▼             ▼
+    Reject       Atomic Claim
+                      │
+                      ▼
+                 Debit / Credit
+                      │
+                      ▼
+                    SETTLED
 
 🌐 **Mesh / Store-and-Forward Model**
 
@@ -441,7 +494,7 @@ The project separates API controllers, cryptographic components, domain models, 
 
 🎯 **Interview Pitch**
 
-"I built a prototype for offline peer-to-peer payments using encrypted QR codes and a store-and-forward mesh model. The backend is implemented with Java and Spring Boot. Payment payloads use RSA-OAEP and AES-256-GCM hybrid encryption, while SHA-256 transaction fingerprints and atomic idempotency handling are used to prevent duplicate settlement when the same transaction reaches the gateway through multiple paths. I also implemented QR generation, a server-side mesh simulation, REST APIs, Swagger documentation, automated tests, Docker support, and GitHub Actions CI."
+"I built a prototype for offline peer-to-peer payments using encrypted QR codes and a store-and-forward mesh model. The backend is implemented with Java and Spring Boot. Payment payloads use RSA-OAEP and AES-256-GCM hybrid encryption, RSA-PSS digital signatures for sender authentication, and SHA-256 transaction fingerprints with atomic idempotency handling to prevent duplicate settlement when the same transaction reaches the gateway through multiple paths. I also implemented QR generation, a server-side mesh simulation, REST APIs, Swagger documentation, automated tests, Docker support, and GitHub Actions CI."
 
 🎓 **What I Learned**
 Through this project, I worked with:
