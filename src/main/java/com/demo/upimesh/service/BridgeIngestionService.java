@@ -70,8 +70,10 @@ public class BridgeIngestionService {
 
             // ---- Settle ----
             Transaction tx = settlement.settle(instruction, packetHash, bridgeNodeId, hopCount);
+            if (tx == null) {
+                return IngestResult.duplicate(packetHash);
+            }
             return IngestResult.settled(packetHash, tx);
-
         } catch (Exception e) {
             log.error("Ingestion error: {}", e.getMessage(), e);
             return IngestResult.invalid("?", "internal_error: " + e.getMessage());

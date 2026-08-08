@@ -47,20 +47,17 @@ public class DemoService {
      *   1. Build a PaymentInstruction with a fresh nonce + signedAt timestamp.
      *   2. Encrypt with the server's public key (hybrid RSA+AES).
      *   3. Wrap in a MeshPacket with TTL.
-     *
-     * In a real Android app, this exact code (minus the server-side reference)
-     * would run on the phone. The phone would have already cached the server's
-     * public key during a previous online session.
      */
     public MeshPacket createPacket(String senderVpa, String receiverVpa,
                                    BigDecimal amount, String pin, int ttl) throws Exception {
+        long signedAt = System.currentTimeMillis();
+        long expiresAt = signedAt + 24 * 60 * 60 * 1000; // 24 hours from now
+        String nonce = UUID.randomUUID().toString();
+        String pinHash = sha256Hex(pin);
+
         PaymentInstruction instruction = new PaymentInstruction(
-                senderVpa,
-                receiverVpa,
-                amount,
-                sha256Hex(pin),
-                UUID.randomUUID().toString(),       // nonce — guarantees uniqueness
-                Instant.now().toEpochMilli()        // signedAt — for freshness check
+                senderVpa, receiverVpa, amount, pinHash, nonce,
+                Long.valueOf(signedAt), Long.valueOf(expiresAt)
         );
 
         String ciphertext = crypto.encrypt(instruction, serverKey.getPublicKey());

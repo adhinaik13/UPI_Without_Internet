@@ -94,11 +94,12 @@ class IdempotencyConcurrencyTest {
         assertEquals("INVALID", r.outcome());
     }
 
-    @Test
+       @Test
     void encryptDecryptRoundTrip() throws Exception {
         PaymentInstruction original = new PaymentInstruction(
                 "alice@demo", "bob@demo", new BigDecimal("123.45"),
-                "abcdef", "nonce-1", System.currentTimeMillis());
+                "abcdef", "nonce-1", System.currentTimeMillis(),
+                System.currentTimeMillis() + 86400000);
 
         String ct = crypto.encrypt(original, serverKey.getPublicKey());
         PaymentInstruction decrypted = crypto.decrypt(ct);
