@@ -76,3 +76,50 @@ Generate an encrypted offline payment QR code in seconds. Scan it with any phone
 ```bash
 ./mvnw spring-boot:run
 # Windows: mvnw.cmd spring-boot:run
+
+
+### Open in Browser
+- **Dashboard:** http://localhost:8080
+- **QR Demo:** http://localhost:8080/qr-demo
+- **API Docs:** http://localhost:8080/swagger-ui.html
+- **H2 Console:** http://localhost:8080/h2-console (dev only)
+
+### Docker
+```bash
+docker-compose up --build
+
+
+---
+
+
+---
+
+## 📡 API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/server-key` | Server RSA public key |
+| POST | `/api/demo/send` | Create & inject payment |
+| GET | `/api/demo/qr` | Generate encrypted QR code |
+| POST | `/api/mesh/gossip` | Run gossip round |
+| POST | `/api/mesh/flush` | Bridges upload to settle |
+| POST | `/api/bridge/ingest` | Production settlement endpoint |
+| GET | `/api/accounts` | List accounts |
+| GET | `/api/transactions` | Transaction history |
+
+---
+
+## 🔐 Security Model
+
+1. **Hybrid Encryption:** AES-256-GCM for payload, RSA-OAEP for key wrapping
+2. **Authenticated Encryption:** GCM authentication tag detects any tampering
+3. **Idempotency:** SHA-256 hash → atomic `putIfAbsent` → exactly one settlement
+4. **Freshness:** 24-hour window prevents replay attacks
+5. **Hardware Security:** Android StrongBox / TEE integration (Phase 2)
+
+---
+
+## 🧪 Testing
+
+```bash
+./mvnw test
