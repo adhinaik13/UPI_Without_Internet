@@ -215,8 +215,8 @@ Each `PaymentInstruction` contains:
 - **`expiresAt`** — epoch millis when the payment expires (default 24h)
 
 The settlement gateway rejects packets where:
-- `age &gt; maxAgeSeconds` (configurable, default 86400)
-- `age &lt; -300` (future-dated, clock-skew tolerance)
+- `age` exceeds `maxAgeSeconds` (configurable, default 86400)
+- `age` is more than 5 minutes in the future (clock-skew tolerance)
 - `nonce` has already been seen (idempotency)
 
 This provides explicit replay-attack protection within the configured time window.
@@ -369,6 +369,7 @@ Current tests cover areas including:
 • Concurrent duplicate ingestion
 • Idempotent settlement behavior
 • Replay attack defense (same packet submitted twice)
+• Digital signature verification (valid signature, forged signature, duplicate)
 
 Concurrency Scenario
 The project includes a concurrency test that simulates multiple delivery attempts for the same transaction.
