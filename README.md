@@ -56,17 +56,17 @@
         │    State      │
         └───────────────┘
 
-🚀 **Live Demo**
+🚀 Live Demo
 
 Run the application locally and open:
 QR Demo: http://localhost:8080/qr-demo
 The demo allows you to generate an encrypted payment QR code and follow the transaction through the simulated offline payment and settlement flow.
 
-🎥 **Demo Video**
+🎥 Demo Video
 
 Watch the full demo on YouTube — Flow shown: QR generation → transaction propagation → bridge ingestion → settlement
 
-✨ **Key Features**
+✨ Key Features
 
 | Feature                           | Implementation                                 | Purpose                                    |
 | --------------------------------- | ---------------------------------------------- | ------------------------------------------ |
@@ -82,7 +82,7 @@ Watch the full demo on YouTube — Flow shown: QR generation → transaction pro
 | 🔄 **Database Migration Support** | Flyway                                         | Manage database schema changes             |
 | 🤖 **CI**                         | GitHub Actions                                 | Automatically build and test changes       |
 
-🛠️ **Tech Stack**
+🛠️ Tech Stack
 
 | Layer                     | Technology                             |
 | ------------------------- | -------------------------------------- |
@@ -100,7 +100,7 @@ Watch the full demo on YouTube — Flow shown: QR generation → transaction pro
 | **Containerization**      | Docker / Docker Compose                |
 | **CI**                    | GitHub Actions                         |
 
-🚀 **Quick Start**
+🚀 Quick Start
 
 Prerequisites
 Make sure you have:
@@ -116,7 +116,7 @@ Linux / macOS
 Windows
 mvnw.cmd spring-boot:run
 
-**Open in Browser**
+Open in Browser
 
 | Service        | URL                                     |
 | -------------- | --------------------------------------- |
@@ -125,14 +125,14 @@ mvnw.cmd spring-boot:run
 | 📚 Swagger UI  | `http://localhost:8080/swagger-ui.html` |
 | 🗄️ H2 Console | `http://localhost:8080/h2-console`      |
 
-**Run with Docker**
+Run with Docker
 
 docker-compose up --build
 
 To stop the containers: 
 docker-compose down
 
-📡 **API Endpoints**
+📡 API Endpoints
 
 | Method | Endpoint             | Description                                    |
 | ------ | -------------------- | ---------------------------------------------- |
@@ -145,7 +145,7 @@ docker-compose down
 | `GET`  | `/api/accounts`      | Retrieve account information                   |
 | `GET`  | `/api/transactions`  | Retrieve transaction history                   |
 
-🔐 **Security Model**
+🔐 Security Model
 
 **1. Hybrid Encryption**
 The payment payload uses a hybrid encryption approach:
@@ -304,8 +304,9 @@ Current tests cover areas including:
 • Duplicate transaction handling
 • Concurrent duplicate ingestion
 • Idempotent settlement behavior
+• Replay attack defense (same packet submitted twice)
 
-**Concurrency Scenario**
+Concurrency Scenario
 The project includes a concurrency test that simulates multiple delivery attempts for the same transaction.
 
              Same Transaction
