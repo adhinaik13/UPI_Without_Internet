@@ -444,8 +444,8 @@ The project separates API controllers, cryptographic components, domain models, 
 "I built a prototype for offline peer-to-peer payments using encrypted QR codes and a store-and-forward mesh model. The backend is implemented with Java and Spring Boot. Payment payloads use RSA-OAEP and AES-256-GCM hybrid encryption, while SHA-256 transaction fingerprints and atomic idempotency handling are used to prevent duplicate settlement when the same transaction reaches the gateway through multiple paths. I also implemented QR generation, a server-side mesh simulation, REST APIs, Swagger documentation, automated tests, Docker support, and GitHub Actions CI."
 
 🎓 **What I Learned**
-
 Through this project, I worked with:
+
 • Spring Boot backend architecture
 • REST API design
 • Cryptographic primitives
@@ -463,13 +463,11 @@ Through this project, I worked with:
 • Docker
 • CI with GitHub Actions
 
-👤 **Author**
+## **👤 Author**
 
-Vankudothu Adhi Naik
-GitHub: https://github.com/adhinaik13
+**Vankudothu Adhi Naik**
 
-📄 **License**
-This project is licensed under the MIT License.
+GitHub: [adhinaik13](https://github.com/adhinaik13)
 
 
 
