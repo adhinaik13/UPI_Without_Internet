@@ -9,4 +9,7 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-      - run: ./mvnw clean package
+      - name: Make mvnw executable
+        run: chmod +x mvnw
+      - name: Build with Maven
+        run: ./mvnw clean package
