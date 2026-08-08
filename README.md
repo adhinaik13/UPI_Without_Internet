@@ -445,7 +445,7 @@ The project separates API controllers, cryptographic components, domain models, 
 
 🎓 **What I Learned**
 
-• Through this project, I worked with:
+Through this project, I worked with:
 • Spring Boot backend architecture
 • REST API design
 • Cryptographic primitives
