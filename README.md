@@ -90,7 +90,7 @@ The demo allows you to generate an encrypted payment QR code and follow the tran
 | **Language**              | Java 17                                |
 | **Backend**               | Spring Boot 3.3                        |
 | **API**                   | REST APIs                              |
-| **Security**              | RSA-OAEP, AES-256-GCM, SHA-256         |
+| **Security**              | RSA-OAEP,AES-256-GCM, RSA-PSS, SHA-256 |
 | **Database**              | H2 for development, PostgreSQL support |
 | **Caching / Idempotency** | ConcurrentHashMap, Redis support       |
 | **QR Generation**         | ZXing                                  |
@@ -207,8 +207,19 @@ Bridge C ─────┘
 
 This is particularly important in a store-and-forward system where the same transaction may reach the settlement gateway through multiple paths.
 
-**4. Transaction Freshness**
-The system uses transaction freshness validation to reject stale payment payloads. The exact freshness/replay guarantees depend on the current implementation and are intentionally kept within the scope of this prototype.
+**4. Transaction Freshness & Replay Defense**
+
+Each `PaymentInstruction` contains:
+- **`nonce`** — a UUID unique to the payment intent
+- **`signedAt`** — epoch millis when the sender signed
+- **`expiresAt`** — epoch millis when the payment expires (default 24h)
+
+The settlement gateway rejects packets where:
+- `age &gt; maxAgeSeconds` (configurable, default 86400)
+- `age &lt; -300` (future-dated, clock-skew tolerance)
+- `nonce` has already been seen (idempotency)
+
+This provides explicit replay-attack protection within the configured time window.
 
 **5. Hardware Security Roadmap**
 Future Android integration can use hardware-backed key storage such as:
@@ -417,13 +428,9 @@ Planned improvements include:
 • WiFi Direct communication
 • Offline device discovery
 
-🔐 Security
-
-• Digital signatures for sender authentication
-• Stronger device identity provisioning
-• Android StrongBox / TEE-backed keys
-• Enhanced replay protection
-• Key rotation and lifecycle management
+### **🔐 Security**
+- ~~Digital signatures for sender authentication~~ ✅ Implemented
+- Stronger device identity provisioning (certificate chains, attestation)
 
 🌐 Distributed System
 
