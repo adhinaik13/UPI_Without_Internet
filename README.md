@@ -527,7 +527,6 @@ Through this project, I worked with:
 ## **👤 Author**
 
 **Vankudothu Adhi Naik**
-
 GitHub: [adhinaik13](https://github.com/adhinaik13)
 
 
