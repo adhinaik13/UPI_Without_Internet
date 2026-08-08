@@ -1,5 +1,6 @@
 package com.demo.upimesh.service;
 
+import com.demo.upimesh.crypto.DigitalSignatureService;
 import com.demo.upimesh.crypto.HybridCryptoService;
 import com.demo.upimesh.crypto.ServerKeyHolder;
 import com.demo.upimesh.model.Account;
@@ -13,13 +14,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.security.KeyPair;
 import java.security.MessageDigest;
 import java.time.Instant;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Helper service that:
  *   - seeds demo accounts on startup
+ *   - registers device keypairs for demo accounts
  *   - simulates "sender phone creates an encrypted packet" flow
  */
 @Service
@@ -30,6 +35,11 @@ public class DemoService {
     @Autowired private AccountRepository accounts;
     @Autowired private HybridCryptoService crypto;
     @Autowired private ServerKeyHolder serverKey;
+    @Autowired private DigitalSignatureService sigService;
+    @Autowired private DeviceIdentityService identity;
+
+    // Simulated device key storage (in a real Android app, this would be in StrongBox/TEE)
+    private final Map<String, KeyPair> deviceKeys = new ConcurrentHashMap<>();
 
     @PostConstruct
     public void seedAccounts() {
@@ -40,13 +50,27 @@ public class DemoService {
             accounts.save(new Account("dave@demo",  "Dave",    new BigDecimal("500.00")));
             log.info("Seeded 4 demo accounts");
         }
+
+        // Register device keys for demo accounts
+        for (String vpa : new String[]{"alice@demo", "bob@demo", "carol@demo", "dave@demo"}) {
+            try {
+                if (!identity.isRegistered(vpa)) {
+                    KeyPair kp = identity.registerDevice(vpa);
+                    deviceKeys.put(vpa, kp);
+                    log.info("Registered device key for {}", vpa);
+                }
+            } catch (Exception e) {
+                log.warn("Failed to register device key for {}: {}", vpa, e.getMessage());
+            }
+        }
     }
 
     /**
      * Simulates the sender's phone:
      *   1. Build a PaymentInstruction with a fresh nonce + signedAt timestamp.
-     *   2. Encrypt with the server's public key (hybrid RSA+AES).
-     *   3. Wrap in a MeshPacket with TTL.
+     *   2. Sign with the device's private key.
+     *   3. Encrypt with the server's public key (hybrid RSA+AES).
+     *   4. Wrap in a MeshPacket with TTL.
      */
     public MeshPacket createPacket(String senderVpa, String receiverVpa,
                                    BigDecimal amount, String pin, int ttl) throws Exception {
@@ -59,6 +83,18 @@ public class DemoService {
                 senderVpa, receiverVpa, amount, pinHash, nonce,
                 Long.valueOf(signedAt), Long.valueOf(expiresAt)
         );
+
+        // Sign with device private key
+        KeyPair deviceKey = deviceKeys.get(senderVpa);
+        if (deviceKey == null) {
+            throw new IllegalStateException("No device key registered for " + senderVpa);
+        }
+        String fingerprint = sigService.fingerprint(deviceKey.getPublic());
+        instruction.setSenderPublicKeyFingerprint(fingerprint);
+
+        byte[] canonical = instruction.canonicalBytes();
+        String signature = sigService.sign(canonical, deviceKey.getPrivate());
+        instruction.setSignature(signature);
 
         String ciphertext = crypto.encrypt(instruction, serverKey.getPublicKey());
 

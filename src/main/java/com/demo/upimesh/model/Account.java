@@ -24,6 +24,12 @@ public class Account {
     @Version  // Optimistic locking — prevents lost updates on concurrent transfers
     private Long version;
 
+    @Column(length = 64)
+    private String publicKeyFingerprint;
+
+    @Column(length = 1024)
+    private String publicKeyBase64;
+
     public Account() {}
 
     public Account(String vpa, String holderName, BigDecimal balance) {
@@ -43,4 +49,10 @@ public class Account {
 
     public Long getVersion() { return version; }
     public void setVersion(Long version) { this.version = version; }
+
+    public String getPublicKeyFingerprint() { return publicKeyFingerprint; }
+    public void setPublicKeyFingerprint(String publicKeyFingerprint) { this.publicKeyFingerprint = publicKeyFingerprint; }
+
+    public String getPublicKeyBase64() { return publicKeyBase64; }
+    public void setPublicKeyBase64(String publicKeyBase64) { this.publicKeyBase64 = publicKeyBase64; }
 }

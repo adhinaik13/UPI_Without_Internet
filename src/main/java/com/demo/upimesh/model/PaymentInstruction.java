@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 
 /**
  * Plaintext payment instruction that gets encrypted into a MeshPacket.
+ * Includes a digital signature so the settlement gateway can verify
+ * that the payment was actually authorized by the claimed sender.
  */
 public class PaymentInstruction {
 
@@ -14,6 +16,10 @@ public class PaymentInstruction {
     private String nonce;        // UUID, unique per payment intent
     private Long signedAt;       // epoch millis, when sender signed
     private Long expiresAt;      // epoch millis, when payment expires (24h window)
+
+    // Digital signature fields
+    private String senderPublicKeyFingerprint; // SHA-256 fingerprint of sender's pubkey
+    private String signature;                  // RSA-PSS signature over canonical data
 
     public PaymentInstruction() {}
 
@@ -26,6 +32,16 @@ public class PaymentInstruction {
         this.nonce = nonce;
         this.signedAt = signedAt;
         this.expiresAt = expiresAt;
+    }
+
+    /**
+     * Canonical bytes for signing/verification.
+     * Excludes the signature field itself to avoid circular dependency.
+     */
+    public byte[] canonicalBytes() {
+        String canonical = senderVpa + "|" + receiverVpa + "|" + amount.toPlainString()
+                + "|" + nonce + "|" + signedAt + "|" + expiresAt;
+        return canonical.getBytes(java.nio.charset.StandardCharsets.UTF_8);
     }
 
     public String getSenderVpa() { return senderVpa; }
@@ -48,4 +64,10 @@ public class PaymentInstruction {
 
     public Long getExpiresAt() { return expiresAt; }
     public void setExpiresAt(Long expiresAt) { this.expiresAt = expiresAt; }
+
+    public String getSenderPublicKeyFingerprint() { return senderPublicKeyFingerprint; }
+    public void setSenderPublicKeyFingerprint(String senderPublicKeyFingerprint) { this.senderPublicKeyFingerprint = senderPublicKeyFingerprint; }
+
+    public String getSignature() { return signature; }
+    public void setSignature(String signature) { this.signature = signature; }
 }

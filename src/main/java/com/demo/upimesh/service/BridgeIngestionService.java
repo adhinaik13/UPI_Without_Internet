@@ -1,5 +1,6 @@
 package com.demo.upimesh.service;
 
+import com.demo.upimesh.crypto.DigitalSignatureService;
 import com.demo.upimesh.crypto.HybridCryptoService;
 import com.demo.upimesh.model.MeshPacket;
 import com.demo.upimesh.model.PaymentInstruction;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.security.PublicKey;
 import java.time.Instant;
 
 /**
@@ -21,8 +23,10 @@ import java.time.Instant;
  *      - If already claimed: this is a duplicate. Drop it.
  *   3. Decrypt the ciphertext with the server's private key.
  *      - If decryption fails: tampered or junk. Reject.
- *   4. Check freshness — reject if signedAt is too old (replay protection).
- *   5. Hand off to SettlementService for the actual debit/credit.
+ *   4. Verify digital signature using the sender's registered public key.
+ *      - If signature invalid: forged or corrupted. Reject.
+ *   5. Check freshness — reject if signedAt is too old (replay protection).
+ *   6. Hand off to SettlementService for the actual debit/credit.
  */
 @Service
 public class BridgeIngestionService {
@@ -30,6 +34,8 @@ public class BridgeIngestionService {
     private static final Logger log = LoggerFactory.getLogger(BridgeIngestionService.class);
 
     @Autowired private HybridCryptoService crypto;
+    @Autowired private DigitalSignatureService sigService;
+    @Autowired private DeviceIdentityService identity;
     @Autowired private IdempotencyService idempotency;
     @Autowired private SettlementService settlement;
 
@@ -57,6 +63,26 @@ public class BridgeIngestionService {
                 return IngestResult.invalid(packetHash, "decryption_failed");
             }
 
+            // ---- Digital signature verification ----
+            String fingerprint = instruction.getSenderPublicKeyFingerprint();
+            if (fingerprint == null || fingerprint.isBlank()) {
+                return IngestResult.invalid(packetHash, "missing_sender_key");
+            }
+
+            PublicKey senderPubKey = identity.getPublicKey(fingerprint);
+            if (senderPubKey == null) {
+                log.warn("Unknown sender public key fingerprint: {}", fingerprint);
+                return IngestResult.invalid(packetHash, "unknown_sender_key");
+            }
+
+            boolean signatureValid = sigService.verify(
+                    instruction.canonicalBytes(), instruction.getSignature(), senderPubKey);
+            if (!signatureValid) {
+                log.warn("Invalid signature for packet {} from sender {}",
+                        packetHash.substring(0, 12) + "...", instruction.getSenderVpa());
+                return IngestResult.invalid(packetHash, "signature_verification_failed");
+            }
+
             // ---- Freshness check (replay protection) ----
             long ageSeconds = (Instant.now().toEpochMilli() - instruction.getSignedAt()) / 1000;
             if (ageSeconds > maxAgeSeconds) {
@@ -74,6 +100,7 @@ public class BridgeIngestionService {
                 return IngestResult.duplicate(packetHash);
             }
             return IngestResult.settled(packetHash, tx);
+
         } catch (Exception e) {
             log.error("Ingestion error: {}", e.getMessage(), e);
             return IngestResult.invalid("?", "internal_error: " + e.getMessage());
