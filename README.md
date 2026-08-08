@@ -14,6 +14,7 @@
 ---
 
 ## 🏗️ Architecture
+
 ┌─────────────────┐      ┌─────────────────┐      ┌─────────────────────────┐
 │  Sender Phone   │      │   Mesh Network  │      │   Spring Boot Gateway   │
 │   (Offline)     │      │                 │      │                         │
@@ -23,7 +24,6 @@
 │ ├─ RSA-OAEP     │      │ └─ Bridge nodes │      │  └─ Debit/Credit (atomic) │
 │ └─ Display QR   │      │                 │      │                         │
 └─────────────────┘      └─────────────────┘      └─────────────────────────┘
-
 
 ---
 
