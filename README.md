@@ -7,20 +7,22 @@
 [![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 
 &gt; **Offline peer-to-peer payments with cryptographic settlement.**
-&gt; Two phones in a basement with zero connectivity can exchange value via QR codes. When any device gains internet, the payment settles atomically with bank-grade security.
+&gt; Two phones with zero connectivity can exchange value via QR codes. When any device gains internet, the payment settles atomically with authenticated encryption and idempotent processing.
 
 &gt; ⚠️ **Current Status:** This repository implements the **backend settlement gateway** and **QR-code payment simulation**. The mesh networking layer (Bluetooth LE, WiFi Direct) is architected and simulated server-side; native Android transport is the next integration phase.
 
 ---
 
 ## 🏗️ Architecture
-
-Sender Phone (Offline)          Mesh Network              Spring Boot Gateway
-├─ Compose payment               ├─ Store & forward        ├─ SHA-256 hash
-├─ AES-256-GCM encrypt           ├─ Gossip protocol          ├─ Atomic claim (Redis/Map)
-├─ RSA-OAEP wrap key             ├─ Bridge nodes             ├─ Decrypt + verify
-└─ Display QR code               └─ Upload when online       ├─ Debit/Credit (atomic TX)
-└─ Write ledger
+┌─────────────────┐      ┌─────────────────┐      ┌─────────────────────────┐
+│  Sender Phone   │      │   Mesh Network  │      │   Spring Boot Gateway   │
+│   (Offline)     │      │                 │      │                         │
+│                 │      │                 │      │  ├─ SHA-256 hash          │
+│ ├─ Compose tx   │─────►│ ├─ Store & fwd  │─────►│  ├─ Atomic claim          │
+│ ├─ AES-GCM enc  │      │ ├─ Gossip       │      │  ├─ Decrypt + verify      │
+│ ├─ RSA-OAEP     │      │ └─ Bridge nodes │      │  └─ Debit/Credit (atomic) │
+│ └─ Display QR   │      │                 │      │                         │
+└─────────────────┘      └─────────────────┘      └─────────────────────────┘
 
 
 ---
@@ -40,13 +42,13 @@ Generate an encrypted offline payment QR code in seconds. Scan it with any phone
 
 | Feature | What It Does | Impact |
 |---------|-------------|--------|
-| **🔐 Hybrid Encryption** | RSA-OAEP + AES-256-GCM with authenticated encryption | Military-grade security, tamper-proof |
+| **🔐 Hybrid Encryption** | RSA-OAEP + AES-256-GCM with authenticated encryption | Confidentiality + integrity for offline payloads |
 | **📱 QR Code Offline Payments** | Generate encrypted payment QR codes without internet | Works anywhere, any phone |
 | **🌐 Mesh Gossip Protocol** | Bluetooth-style store-and-forward across devices | No infrastructure needed |
-| **⚡ Atomic Idempotency** | SHA-256 hash + `putIfAbsent` = exactly one settlement | Prevents double-spending |
-| **🛡️ Hardware Security Ready** | Android StrongBox / TEE integration planned | Keys never leave secure element |
-| **📊 Real-time Dashboard** | Thymeleaf + Web UI for monitoring | Production observability |
-| **📚 Auto API Docs** | Swagger/OpenAPI at `/swagger-ui.html` | Professional documentation |
+| **⚡ Atomic Idempotency** | SHA-256 hash + `putIfAbsent` = exactly one settlement | Prevents double-spending under concurrent load |
+| **🛡️ Hardware Security Planned** | Android StrongBox / TEE integration roadmap | Keys never leave secure element |
+| **📊 Real-time Dashboard** | Thymeleaf + Web UI for monitoring | Transaction visibility |
+| **📚 Auto API Docs** | Swagger/OpenAPI at `/swagger-ui.html` | Interactive API documentation |
 
 ---
 
@@ -55,7 +57,7 @@ Generate an encrypted offline payment QR code in seconds. Scan it with any phone
 | Layer | Technology |
 |-------|-----------|
 | **Backend** | Spring Boot 3.3, Java 17 |
-| **Security** | RSA-2048 OAEP, AES-256-GCM, SHA-256, libsodium |
+| **Security** | RSA-2048 OAEP, AES-256-GCM, SHA-256 |
 | **Database** | H2 (dev) / PostgreSQL (prod) |
 | **Cache** | ConcurrentHashMap (dev) / Redis (prod) |
 | **QR Codes** | ZXing (Google) |
