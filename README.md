@@ -4,7 +4,7 @@
 
 [![Java 17](https://img.shields.io/badge/Java-17-blue)](https://adoptium.net/)
 [![Spring Boot 3.3](https://img.shields.io/badge/Spring%20Boot-3.3-green)](https://spring.io/projects/spring-boot)
-[![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
+![License](https://img.shields.io/badge/License-MIT-yellow)
 
 &gt; **Offline peer-to-peer payments with cryptographic settlement.**
 &gt;
@@ -62,9 +62,9 @@ Run the application locally and open:
 QR Demo: http://localhost:8080/qr-demo
 The demo allows you to generate an encrypted payment QR code and follow the transaction through the simulated offline payment and settlement flow.
 
-🎥 Demo Video
+### **🎥 Demo Video**
 
-Watch the full demo on YouTube — Flow shown: QR generation → transaction propagation → bridge ingestion → settlement
+[Watch the full demo on YouTube](https://youtu.be/_jcLwtK2IOU) — Flow shown: QR generation → transaction propagation → bridge ingestion → settlement
 
 ✨ Key Features
 
