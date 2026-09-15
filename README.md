@@ -498,29 +498,6 @@ The project separates API controllers, cryptographic components, domain models, 
 • Valid transaction is settled
 • Transaction is recorded in the ledger
 
-🎯 **Interview Pitch**
-
-"I built a prototype for offline peer-to-peer payments using encrypted QR codes and a store-and-forward mesh model. The backend is implemented with Java and Spring Boot. Payment payloads use RSA-OAEP and AES-256-GCM hybrid encryption, RSA-PSS digital signatures for sender authentication, and SHA-256 transaction fingerprints with atomic idempotency handling to prevent duplicate settlement when the same transaction reaches the gateway through multiple paths. I also implemented QR generation, a server-side mesh simulation, REST APIs, Swagger documentation, automated tests, Docker support, and GitHub Actions CI."
-
-🎓 **What I Learned**
-Through this project, I worked with:
-
-• Spring Boot backend architecture
-• REST API design
-• Cryptographic primitives
-• Hybrid encryption
-• AES-GCM authenticated encryption
-• RSA-OAEP
-• SHA-256 hashing
-• Idempotency
-• Concurrent request handling
-• Store-and-forward systems
-• Distributed transaction concepts
-• Database persistence
-• API documentation
-• Automated testing
-• Docker
-• CI with GitHub Actions
 
 ## **👤 Author**
 
