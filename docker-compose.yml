@@ -5,7 +5,7 @@ services:
     environment:
       POSTGRES_DB: upimesh
       POSTGRES_USER: upi
-      POSTGRES_PASSWORD: upi_secret
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
